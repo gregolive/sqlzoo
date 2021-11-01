@@ -1,73 +1,63 @@
--- 1. Change the query shown so that it displays Nobel prizes for 1950.
+-- 1. Show the name, continent and population of all countries.
 
-SELECT yr, subject, winner FROM nobel
-  WHERE yr = 1950;
+SELECT name, continent, population FROM world;
 
--- 2. Show who won the 1962 prize for Literature.
+-- 2. Show the name for the countries that have a population of at least 200 million.
 
-SELECT winner FROM nobel
- WHERE yr = 1962 AND subject = 'Literature';
+SELECT name FROM world
+  WHERE population >= 2000000;
 
- -- 3. Show the year and subject that won 'Albert Einstein' his prize.
+-- 3. Give the name and the per capita GDP for those countries with a population of at least 200 million.
 
-SELECT yr, subject FROM nobel
-  WHERE winner = 'Albert Einstein';
+SELECT name, gdp/population FROM world
+  WHERE population > 200000000;
 
--- 4. Give the name of the 'Peace' winners since the year 2000, including 2000.
+-- 4. Show the name and population in millions for the countries of the continent 'South America'.
 
-SELECT winner FROM nobel
-  WHERE subject = 'Peace' AND yr >= 2000;
+SELECT name, population/1000000 FROM world
+  WHERE continent = 'South America';
 
--- 5. Show all details (yr, subject, winner) of the Literature prize winners for 1980 to 1989 inclusive.
+-- 5. Show the name and population for France, Germany, Italy
 
-SELECT * FROM nobel
-  WHERE subject = 'Literature' AND yr BETWEEN 1980 AND 1989;
+SELECT name, population FROM world
+  WHERE name IN ('France', 'Germany', 'Italy');
 
--- 6. Show all details of the presidential winners: Theodore Roosevelt, Woodrow Wilson, Jimmy Carter, and Barack Obama.
+-- 6. Show the countries which have a name that includes the word 'United'
 
-SELECT * FROM nobel
- WHERE winner IN ('Theodore Roosevelt',
-                  'Woodrow Wilson',
-                  'Jimmy Carter',
-                  'Barack Obama');
+SELECT name FROM world
+  WHERE name LIKE '%United%';
 
--- 7. Show the winners with first name John.
+-- 7. Show the countries that are big by area (more than 3 million) or big by population (more than 250 million). Show name, population and area.
 
-SELECT winner FROM nobel
-  WHERE winner LIKE 'John%';
+SELECT name, population, area FROM world
+  WHERE population > 250000000 OR area > 3000000;
 
--- 8. Show the year, subject, and name of Physics winners for 1980 together with the Chemistry winners for 1984.
+-- 8. Show the countries that are big by area (more than 3 million) or big by population (more than 250 million) but not both. Show name, population and area.
 
-SELECT yr, subject, winner FROM nobel
-  WHERE (subject = 'Chemistry' AND yr= '1984') OR (subject = 'Physics' AND yr= '1980');
+SELECT name, population, area FROM world
+  WHERE population > 250000000 XOR area > 3000000;
 
--- 9. Show the year, subject, and name of winners for 1980 excluding Chemistry and Medicine.
+-- 9. Show the name and population in millions and the GDP in billions for the countries of the continent 'South America'. Use the ROUND function to show the values to two decimal places.
 
-SELECT yr, subject, winner FROM nobel
-  WHERE yr = '1980' AND subject NOT IN ('Chemistry', 'Medicine');
+SELECT name, ROUND(population/1000000, 2), ROUND(gdp/1000000000, 2) FROM world
+  WHERE continent = 'South America';
 
--- 10. Show year, subject, and name of people who won a 'Medicine' prize in an early year (before 1910, not including 1910) together with winners of a 'Literature' prize in a later year (after 2004, including 2004)
+-- 10. Show per-capita GDP for the trillion dollar countries to the nearest $1000.
 
-SELECT yr, subject, winner FROM nobel
-  WHERE (subject = 'Medicine' AND yr < 1910) OR (subject = 'Literature' AND yr >= 2004);
+SELECT name, ROUND(gdp/population, -3) FROM world
+  WHERE gdp > 1000000000000;
 
--- 11. Find all details of the prize won by PETER GRÜNBERG.
+-- 11. Show the name and capital where the name and the capital have the same number of characters.
 
-SELECT * FROM nobel
-  WHERE winner = 'PETER GRÜNBERG';
+SELECT name, capital FROM world
+  WHERE LENGTH(name) = LENGTH(capital);
 
--- 12. Find all details of the prize won by EUGENE O'NEILL.
+-- 12. Show the name and the capital where the first letters of each match. Don't include countries where the name and the capital are the same word.
 
-SELECT * FROM nobel
-  WHERE winner = 'EUGENE O''NEILL';
+SELECT name, capital FROM world
+  WHERE LEFT(name,1) = LEFT(capital,1) AND name <> capital;
 
--- 13. List the winners, year and subject where the winner starts with Sir. Show the the most recent first, then by name order.
+-- 13. Find the country that has all the vowels and no spaces in its name.
 
-SELECT winner, yr, subject FROM nobel
-  WHERE winner LIKE 'Sir%';
-
--- 14. Show the 1984 winners and subject ordered by subject and winner name; but list Chemistry and Physics last.
-
-SELECT winner, subject AS Sub FROM nobel
-  WHERE yr=1984
-  ORDER BY subject IN ('Physics','Chemistry'), subject, winner;
+SELECT name FROM world
+ WHERE name LIKE '%A%' AND name LIKE '%E%' AND name LIKE '%I%' AND name LIKE '%O%' AND name LIKE '%U%'AND name NOT LIKE '% %'

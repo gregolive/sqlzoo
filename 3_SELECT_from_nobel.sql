@@ -1,72 +1,73 @@
--- 1. List each country name where the population is larger than that of 'Russia'.
+-- 1. Change the query shown so that it displays Nobel prizes for 1950.
 
-SELECT name FROM world
-  WHERE population >
-     (SELECT population FROM world
-       WHERE name='Russia');
+SELECT yr, subject, winner FROM nobel
+  WHERE yr = 1950;
 
--- 2. Show the countries in Europe with a per capita GDP greater than 'United Kingdom'.
+-- 2. Show who won the 1962 prize for Literature.
 
-SELECT name FROM world
-  WHERE continent = 'Europe' AND gdp/population > 
-      (SELECT gdp/population FROM world
-        WHERE name = 'United Kingdom');
+SELECT winner FROM nobel
+ WHERE yr = 1962 AND subject = 'Literature';
 
--- 3. List the name and continent of countries in the continents containing either Argentina or Australia. Order by name of the country.
+ -- 3. Show the year and subject that won 'Albert Einstein' his prize.
 
-SELECT name, continent FROM world
-  WHERE continent = 
-      (SELECT continent FROM world
-        WHERE name = 'Argentina') 
-  OR continent = 
-      (SELECT continent FROM world
-        WHERE name = 'Australia')
-ORDER BY name;
+SELECT yr, subject FROM nobel
+  WHERE winner = 'Albert Einstein';
 
--- 4. Which country has a population that is more than Canada but less than Poland? Show the name and the population.
+-- 4. Give the name of the 'Peace' winners since the year 2000, including 2000.
 
-SELECT name, population FROM world
-  WHERE population > 
-      (SELECT population FROM world WHERE name = 'Canada')
-  AND population < 
-      (SELECT population FROM world WHERE name = 'Poland');
+SELECT winner FROM nobel
+  WHERE subject = 'Peace' AND yr >= 2000;
 
--- 5. Show the name and the population of each country in Europe. Show the population as a percentage of the population of Germany.
+-- 5. Show all details (yr, subject, winner) of the Literature prize winners for 1980 to 1989 inclusive.
 
-SELECT name, CONCAT(ROUND(population/
-    (SELECT population FROM world WHERE name = 'Germany')*100,0),'%')
-  FROM world
-  WHERE continent = 'Europe';
+SELECT * FROM nobel
+  WHERE subject = 'Literature' AND yr BETWEEN 1980 AND 1989;
 
--- 6. Which countries have a GDP greater than every country in Europe?
+-- 6. Show all details of the presidential winners: Theodore Roosevelt, Woodrow Wilson, Jimmy Carter, and Barack Obama.
 
-SELECT name FROM world
-  WHERE gdp > (SELECT MAX(gdp) FROM world WHERE continent = 'Europe');
+SELECT * FROM nobel
+ WHERE winner IN ('Theodore Roosevelt',
+                  'Woodrow Wilson',
+                  'Jimmy Carter',
+                  'Barack Obama');
 
--- 7. Find the largest country (by area) in each continent, show the continent, the name and the area.
+-- 7. Show the winners with first name John.
 
-SELECT continent, name, area FROM world x
-  WHERE area >= 
-      ALL (SELECT area FROM world y
-      WHERE y.continent=x.continent AND area>0);
+SELECT winner FROM nobel
+  WHERE winner LIKE 'John%';
 
--- 8. List each continent and the name of the country that comes first alphabetically.
+-- 8. Show the year, subject, and name of Physics winners for 1980 together with the Chemistry winners for 1984.
 
-SELECT continent, name FROM world x
-  WHERE name <= 
-      ALL (SELECT name FROM world y
-        WHERE y.continent = x.continent);
+SELECT yr, subject, winner FROM nobel
+  WHERE (subject = 'Chemistry' AND yr= '1984') OR (subject = 'Physics' AND yr= '1980');
 
--- 9. Find the continents where all countries have a population <= 25000000. Then find the names of the countries associated with these continents. Show name, continent and population.
+-- 9. Show the year, subject, and name of winners for 1980 excluding Chemistry and Medicine.
 
-SELECT name, continent, population FROM world x
-  WHERE 25000000 > 
-      ALL (SELECT population FROM world y
-        WHERE y.continent = x.continent);
+SELECT yr, subject, winner FROM nobel
+  WHERE yr = '1980' AND subject NOT IN ('Chemistry', 'Medicine');
 
--- 10. Some countries have populations more than three times that of any of their neighbours (in the same continent). Give the countries and continents.
+-- 10. Show year, subject, and name of people who won a 'Medicine' prize in an early year (before 1910, not including 1910) together with winners of a 'Literature' prize in a later year (after 2004, including 2004)
 
-SELECT name, continent FROM world x
-  WHERE population > 3 * 
-  (SELECT MAX(population) FROM world y
-  WHERE y.continent = x.continent AND y.name != x.name);
+SELECT yr, subject, winner FROM nobel
+  WHERE (subject = 'Medicine' AND yr < 1910) OR (subject = 'Literature' AND yr >= 2004);
+
+-- 11. Find all details of the prize won by PETER GRÜNBERG.
+
+SELECT * FROM nobel
+  WHERE winner = 'PETER GRÜNBERG';
+
+-- 12. Find all details of the prize won by EUGENE O'NEILL.
+
+SELECT * FROM nobel
+  WHERE winner = 'EUGENE O''NEILL';
+
+-- 13. List the winners, year and subject where the winner starts with Sir. Show the the most recent first, then by name order.
+
+SELECT winner, yr, subject FROM nobel
+  WHERE winner LIKE 'Sir%';
+
+-- 14. Show the 1984 winners and subject ordered by subject and winner name; but list Chemistry and Physics last.
+
+SELECT winner, subject AS Sub FROM nobel
+  WHERE yr=1984
+  ORDER BY subject IN ('Physics','Chemistry'), subject, winner;
